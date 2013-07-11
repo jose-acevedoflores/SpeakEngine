@@ -13,6 +13,9 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 public class SpeakEngineMain extends Activity implements TextToSpeech.OnInitListener {
 
@@ -21,12 +24,15 @@ public class SpeakEngineMain extends Activity implements TextToSpeech.OnInitList
 
 	private HashMap<String, String> map;
 	private TextToSpeech tts;
+	
+	private Button button;
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		this.init();
 	}
 
 	@Override
@@ -36,12 +42,14 @@ public class SpeakEngineMain extends Activity implements TextToSpeech.OnInitList
 		return true;
 	}
 
+	@SuppressLint("NewApi")
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 		if (requestCode == CHECK_TTS_DATA_REQUEST_CODE) {
 
 			if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-				tts = new TextToSpeech(getApplicationContext(), this); // 1
+				tts = new TextToSpeech(getApplicationContext(), this, "com.ivona.tts"); 
+				
 				tts.setLanguage(Locale.US);
 			} else {
 				// TTS data not yet loaded, try to install it
@@ -69,8 +77,21 @@ public class SpeakEngineMain extends Activity implements TextToSpeech.OnInitList
 		}	
 	}
 
+	@SuppressLint("NewApi")
 	public void init()
 	{
+		
+		button = (Button) findViewById(R.id.button1);
+		button.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				for(TextToSpeech.EngineInfo e : tts.getEngines())
+					System.out.println("Engine name: " + e.name);
+				tts.speak("This is a test to hear my voice", TextToSpeech.QUEUE_FLUSH, null);
+			}
+		});
+		
 		//TTS engine part
 		map = new HashMap<String, String>();
 		//Verify if TTS is available 
@@ -83,9 +104,10 @@ public class SpeakEngineMain extends Activity implements TextToSpeech.OnInitList
 	public void onInit(int status) {
 		if(status == TextToSpeech.SUCCESS)
 		{
+
 			tts.setOnUtteranceProgressListener(new MyUtteranceListener());
 			map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "onRespond");
-			tts.speak("This is a test to hear my voice", TextToSpeech.QUEUE_ADD, map );
+			//tts.speak("This is a test to hear my voice", TextToSpeech.QUEUE_ADD, map );
 		}
 		else
 		{
@@ -95,7 +117,10 @@ public class SpeakEngineMain extends Activity implements TextToSpeech.OnInitList
 	}
 
 	/**
-	 * 
+	 * NOTES: in the HashMap map, the value that we store when we pass it to the speak method
+	 * 		map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "onRespond");
+			tts.speak("This is a test to hear my voice", TextToSpeech.QUEUE_ADD, map );
+		In this example is "onRespond", the value of utteranceId will be the value stored in the map.	
 	 * @author joseacevedo
 	 *
 	 */
@@ -122,7 +147,7 @@ public class SpeakEngineMain extends Activity implements TextToSpeech.OnInitList
 
 		@Override
 		public void onStart(String utteranceId) {
-
+			
 			Log.d("DEBUG", "Utterance Started " + utteranceId);
 
 		}
