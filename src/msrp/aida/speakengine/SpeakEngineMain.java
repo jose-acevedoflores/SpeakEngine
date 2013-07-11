@@ -51,6 +51,9 @@ public class SpeakEngineMain extends Activity implements TextToSpeech.OnInitList
 				tts = new TextToSpeech(getApplicationContext(), this, "com.ivona.tts"); 
 				
 				tts.setLanguage(Locale.US);
+				
+				for( TextToSpeech.EngineInfo e : tts.getEngines())
+					System.out.println("Engine: "+e.name);
 			} else {
 				// TTS data not yet loaded, try to install it
 				Intent ttsLoadIntent = new Intent();
@@ -88,7 +91,7 @@ public class SpeakEngineMain extends Activity implements TextToSpeech.OnInitList
 			public void onClick(View v) {
 				for(TextToSpeech.EngineInfo e : tts.getEngines())
 					System.out.println("Engine name: " + e.name);
-				tts.speak("This is a test to hear my voice", TextToSpeech.QUEUE_FLUSH, null);
+				tts.speak("Esto es una prueba ", TextToSpeech.QUEUE_FLUSH, null);
 			}
 		});
 		
